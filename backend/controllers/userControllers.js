@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const generateToken = require("../config/generateToken");
 
+// Registration
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, pic } = req.body;
 
@@ -37,6 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+// Login
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -54,7 +56,7 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-// /api/user?search=
+// Search User
 const allUsers = asyncHandler(async (req, res) => {
   const keyword = req.query.search
     ? {

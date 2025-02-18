@@ -46,6 +46,7 @@ const server = app.listen(PORT, () =>
   console.log(`Server is running on port ${PORT}`.yellow.bold)
 );
 
+// Socket.io Implementation
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {

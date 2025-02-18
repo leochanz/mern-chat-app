@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
 
+// Create or Access a One on one Chat
 const accessChat = asyncHandler(async (req, res) => {
   const { userId } = req.body;
 
@@ -48,6 +49,7 @@ const accessChat = asyncHandler(async (req, res) => {
   }
 });
 
+// Fetching Chats
 const fetchChats = asyncHandler(async (req, res) => {
   try {
     Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
@@ -66,6 +68,7 @@ const fetchChats = asyncHandler(async (req, res) => {
   } catch (error) {}
 });
 
+// Create Group
 const createGroupChat = asyncHandler(async (req, res) => {
   if (!req.body.users || !req.body.name) {
     return res.status(400).send({ message: "Please Fill all the fields" });
@@ -99,6 +102,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
   }
 });
 
+// Rename the Group
 const renameGroup = asyncHandler(async (req, res) => {
   const { chatId, chatName } = req.body;
 
@@ -120,6 +124,7 @@ const renameGroup = asyncHandler(async (req, res) => {
   }
 });
 
+// Add user to group
 const addToGroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.body;
 
@@ -141,6 +146,7 @@ const addToGroup = asyncHandler(async (req, res) => {
   }
 });
 
+// Remove user from group
 const removeFromGroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.body;
 
