@@ -16,6 +16,7 @@ import ScrollableChat from "./ScrollableChat";
 import { Button } from "./ui/button";
 import { Field } from "./ui/field";
 import { toaster } from "./ui/toaster";
+import { Avatar } from "./ui/avatar";
 import axios from "axios";
 import "./styles.css";
 import io from "socket.io-client";
@@ -35,6 +36,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [typingUser, setTypingUser] = useState([]);
 
   const defaultOptions = {
     loop: true,
@@ -81,8 +83,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     socket = io(ENDPOINT);
     socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
-    socket.on("typing", () => setIsTyping(true));
-    socket.on("stop typing", () => setIsTyping(false));
+    socket.on("typing", (userData) => {
+      setIsTyping(true);
+      setTypingUser([...typingUser, userData]);
+      console.log("typingUser:", [...typingUser, userData]);
+    });
+    socket.on("stop typing", (userData) => {
+      setIsTyping(false);
+      setTypingUser(typingUser.filter((user) => user._id !== userData._id));
+      console.log(
+        "stop typingUser:",
+        typingUser.filter((user) => user._id !== userData._id)
+      );
+    });
   }, []);
 
   useEffect(() => {
@@ -109,7 +122,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage) {
-      socket.emit("stop typing", selectedChat._id);
+      const userData = { _id: user._id, name: user.name, pic: user.pic };
+      socket.emit("stop typing", selectedChat._id, userData);
       try {
         const config = {
           headers: {
@@ -152,7 +166,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     if (!typing) {
       setTyping(true);
-      socket.emit("typing", selectedChat._id);
+      const userData = { _id: user._id, name: user.name, pic: user.pic };
+      socket.emit("typing", selectedChat._id, userData);
     }
     let lastTypingTime = new Date().getTime();
     var timerLength = 3000;
@@ -161,13 +176,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       var timeDiff = timeNow - lastTypingTime;
 
       if (timeDiff >= timerLength && typing) {
-        socket.emit("stop typing", selectedChat._id);
+        const userData = { _id: user._id, name: user.name, pic: user.pic };
+        socket.emit("stop typing", selectedChat._id, userData);
         setTyping(false);
       }
     }, timerLength);
   };
 
-  console.log(notification);
+  // console.log(notification);
 
   return (
     <>
@@ -234,15 +250,29 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             <Fieldset.Root>
               <Fieldset.Content>
                 <Field mt={3} onKeyDown={sendMessage} isRequired>
-                  {isTyping ? (
-                    <Lottie
-                      options={defaultOptions}
-                      width={70}
-                      height={30}
-                      style={{ marginBottom: 15, marginLeft: 0 }}
-                    />
-                  ) : (
-                    <></>
+                  {isTyping && (
+                    <Box
+                      display="flex"
+                      flexDir="row"
+                      alignItems="center"
+                      mt="7px"
+                    >
+                      {typingUser.map((user) => (
+                        <Avatar
+                          mr={1}
+                          size="sm"
+                          cursor="pointer"
+                          name={user.name}
+                          src={user.pic}
+                        />
+                      ))}
+                      <Lottie
+                        options={defaultOptions}
+                        width={70}
+                        height={30}
+                        style={{ marginBottom: 15, marginLeft: 0 }}
+                      />
+                    </Box>
                   )}
                   <Group w="100%" attached>
                     <Input
