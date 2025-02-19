@@ -110,7 +110,7 @@ const Signup = () => {
 
       localStorage.setItem("userInfo", JSON.stringify(data));
       setLoading(false);
-      navigate("/chat");
+      navigate("/chats");
     } catch (error) {
       toaster.create({
         title: "Error Occured!",
