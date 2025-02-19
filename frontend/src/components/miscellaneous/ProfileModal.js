@@ -62,12 +62,6 @@ const ProfileModal = ({ user, children }) => {
               Email: {user.email}
             </Text>
           </DialogBody>
-          <DialogFooter>
-            <DialogActionTrigger asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogActionTrigger>
-            <Button>Save</Button>
-          </DialogFooter>
           <DialogCloseTrigger />
         </DialogContent>
       </DialogRoot>
