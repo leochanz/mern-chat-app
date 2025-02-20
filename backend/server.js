@@ -61,7 +61,7 @@ io.on("connection", (socket) => {
 
   socket.on("setup", (userData) => {
     socket.join(userData._id);
-    console.log(userData._id);
+    console.log(`User ${userData._id} is online`);
     socket.emit("connected");
   });
 
